@@ -28,6 +28,5 @@ class UpdateCartItemUseCase @Inject constructor(
         }
 
         cartItemRepository.updateQuantity(productId, quantity)
-
     }
 }

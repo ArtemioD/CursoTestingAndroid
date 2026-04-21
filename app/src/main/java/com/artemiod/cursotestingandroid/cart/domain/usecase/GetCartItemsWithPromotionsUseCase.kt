@@ -3,6 +3,7 @@ package com.artemiod.cursotestingandroid.cart.domain.usecase
 import com.artemiod.cursotestingandroid.cart.domain.ex.activeAt
 import com.artemiod.cursotestingandroid.cart.domain.repository.CartItemRepository
 import com.artemiod.cursotestingandroid.cart.presentation.model.CartItemWithPromotion
+import com.artemiod.cursotestingandroid.core.domain.util.Clock
 import com.artemiod.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import com.artemiod.cursotestingandroid.productlist.domain.repository.ProductRepository
 import com.artemiod.cursotestingandroid.productlist.domain.repository.PromotionRepository
@@ -18,7 +19,8 @@ class GetCartItemsWithPromotionsUseCase @Inject constructor(
     private val cartItemRepository: CartItemRepository,
     private val productRepository: ProductRepository,
     private val promotionRepository: PromotionRepository,
-    private val getPromotionForProduct: GetPromotionForProduct
+    private val getPromotionForProduct: GetPromotionForProduct,
+    private val clock: Clock
 ) {
 
     operator fun invoke(): Flow<List<CartItemWithPromotion>> {
@@ -31,7 +33,7 @@ class GetCartItemsWithPromotionsUseCase @Inject constructor(
                     productRepository.getProductsByIds(ids),
                     promotionRepository.getActivePromotions()
                 ) { products, promotions ->
-                    val now = Instant.now()
+                    val now = clock.now()
                     val activePromotions = promotions.activeAt(now)
                     val productsById = products.associateBy { it.id }
                     cartItems.mapNotNull { cartItem ->

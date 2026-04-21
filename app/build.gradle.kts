@@ -106,4 +106,10 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Test +
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk) // https://mockk.io/
+    testImplementation(kotlin("test"))
+    testImplementation(libs.turbine) // https://github.com/cashapp/turbine
 }

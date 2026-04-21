@@ -70,7 +70,7 @@ fun CartScreen(onBack: () -> Unit, cartViewModel: ContractCart = hiltViewModel<C
     LaunchedEffect(Unit) {
         cartViewModel.event.collect { event ->
             when (event) {
-                is CartEvent.showMessage -> snackbarHostState.showSnackbar(event.message)
+                is CartEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -94,7 +94,7 @@ fun CartScreen(onBack: () -> Unit, cartViewModel: ContractCart = hiltViewModel<C
                         .fillMaxSize()
                         .padding(paddingValues),
                     state = state,
-                    onRetrySelected = { cartViewModel.loadCart() }
+                    onRetrySelected = { cartViewModel.refresh() }
                 )
             }
 

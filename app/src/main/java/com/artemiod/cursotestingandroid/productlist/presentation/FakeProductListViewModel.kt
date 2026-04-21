@@ -14,7 +14,6 @@ interface ContractProductList {
     val uiState: StateFlow<ProductListUIState>
     val events: SharedFlow<ProductListEvent>
     val filterVisible: StateFlow<Boolean>
-    fun loadProducts()
     fun setCategory(category: String?)
     fun setSortOption(sortOption: SortOption)
     fun setFilterVisible(showFilters: Boolean)
@@ -33,7 +32,6 @@ class FakeProductListViewModel() : ViewModel(), ContractProductList {
         )
     override val events: SharedFlow<ProductListEvent> = MutableSharedFlow()
     override val filterVisible: StateFlow<Boolean> = MutableStateFlow(true)
-    override fun loadProducts() {}
     override fun setCategory(category: String?) {}
     override fun setSortOption(sortOption: SortOption) {}
     override fun setFilterVisible(showFilters: Boolean) {}

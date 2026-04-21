@@ -1,6 +1,7 @@
 package com.artemiod.cursotestingandroid.detail.domain.usecase
 
 import com.artemiod.cursotestingandroid.cart.domain.ex.activeAt
+import com.artemiod.cursotestingandroid.core.domain.util.Clock
 import com.artemiod.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import com.artemiod.cursotestingandroid.productlist.domain.repository.ProductRepository
 import com.artemiod.cursotestingandroid.productlist.domain.repository.PromotionRepository
@@ -13,7 +14,8 @@ import javax.inject.Inject
 class GetProductDetailWithPromotionUseCase @Inject constructor(
     private val productRepository: ProductRepository,
     private val promotionRepository: PromotionRepository,
-    private val getPromotionForProduct: GetPromotionForProduct
+    private val getPromotionForProduct: GetPromotionForProduct,
+    private val clock: Clock
 ) {
 
     operator fun invoke(productId: String): Flow<ProductWithPromotion?> {
@@ -22,7 +24,7 @@ class GetProductDetailWithPromotionUseCase @Inject constructor(
             promotionRepository.getActivePromotions()
         ) { product, promotions ->
 
-            val now = Instant.now()
+            val now = clock.now()
             val activePromotions = promotions.activeAt(now)
 
             product?.let {

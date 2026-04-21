@@ -3,7 +3,9 @@ package com.artemiod.cursotestingandroid.di
 import com.artemiod.cursotestingandroid.cart.data.repository.CartItemRepositoryImp
 import com.artemiod.cursotestingandroid.cart.domain.repository.CartItemRepository
 import com.artemiod.cursotestingandroid.core.data.coroutines.DefaultDispatchersProvider
+import com.artemiod.cursotestingandroid.core.data.util.SystemClock
 import com.artemiod.cursotestingandroid.core.domain.corroutines.DispatchersProvider
+import com.artemiod.cursotestingandroid.core.domain.util.Clock
 import com.artemiod.cursotestingandroid.productlist.data.repository.ProductRepositoryImp
 import com.artemiod.cursotestingandroid.productlist.data.repository.PromotionRepositoryImp
 import com.artemiod.cursotestingandroid.productlist.data.repository.SettingsRepositoryImp
@@ -48,5 +50,11 @@ object DataModule {
     @Singleton
     fun provideCartRepository(cartRepositoryImp: CartItemRepositoryImp): CartItemRepository {
         return cartRepositoryImp
+    }
+
+    @Provides
+    @Singleton
+    fun provideClock(systemClock: SystemClock): Clock {
+        return systemClock
     }
 }

@@ -1,7 +1,6 @@
 package com.artemiod.cursotestingandroid.detail.presentation
 
 import android.R
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -236,16 +235,14 @@ fun ProductDetailScreen(
 
                                 val hasStock = product.stock > 0
                                 val stockContainerColor = if (hasStock) {
-                                        MaterialTheme.colorScheme.primaryContainer
-                                    }
-                                    else {
-                                        MaterialTheme.colorScheme.errorContainer
-                                    }
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.errorContainer
+                                }
 
                                 val stockContentColor = if (hasStock) {
                                     MaterialTheme.colorScheme.onPrimaryContainer
-                                }
-                                else {
+                                } else {
                                     MaterialTheme.colorScheme.onErrorContainer
                                 }
 

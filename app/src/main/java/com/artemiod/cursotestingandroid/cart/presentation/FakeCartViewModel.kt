@@ -15,11 +15,11 @@ import kotlinx.coroutines.flow.StateFlow
 interface ContractCart {
     val uiState: StateFlow<CartUiState>
     val event: SharedFlow<CartEvent>
-    fun loadCart()
     fun updateCartItem(productId: String, quantity: Int)
     fun removeFromCart(productId: String)
     fun increaseQuantity(productId: String, currentQuantity: Int)
     fun decreaseQuantity(productId: String, currentQuantity: Int)
+    fun refresh()
 
 }
 
@@ -32,11 +32,11 @@ class FakeCartViewModel : ViewModel(), ContractCart {
         )
     )
     override val event: SharedFlow<CartEvent> = MutableSharedFlow()
-    override fun loadCart() {}
     override fun updateCartItem(productId: String, quantity: Int) {}
     override fun removeFromCart(productId: String) {}
     override fun increaseQuantity(productId: String, currentQuantity: Int) {}
     override fun decreaseQuantity(productId: String, currentQuantity: Int) {}
+    override fun refresh() {}
 }
 
 fun cartItem() = listOf(

@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,11 +26,48 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
-    private val getProductsUseCase: GetProductsUseCase,
+    getProductsUseCase: GetProductsUseCase,
     private val settingsRepository: SettingsRepository
 ) : ViewModel(), ContractProductList {
-    private val _uiState = MutableStateFlow<ProductListUIState>(ProductListUIState.Loading)
-    override val uiState: StateFlow<ProductListUIState> = _uiState.asStateFlow()
+
+    override val uiState: StateFlow<ProductListUIState> = combine(
+        getProductsUseCase(),
+        settingsRepository.selectedCategory,
+        settingsRepository.sortOption
+    ) { products, category, sortOption ->
+
+        var filteredProducts = products
+
+        if (category != null) {
+            filteredProducts = filteredProducts.filter { it.product.category == category }
+        }
+
+        val sorted = when (sortOption) {
+            PRICE_ASC -> filteredProducts.sortedBy { effectivePrice(it) }
+            PRICE_DESC -> filteredProducts.sortedByDescending { effectivePrice(it) }
+            NONE -> filteredProducts
+            DISCOUNT ->
+                filteredProducts.sortedWith (
+                    compareByDescending<ProductWithPromotion> { effectiveDiscountPercent(it) }
+                        .thenBy { it.promotion == null }
+                )
+        }
+
+        val categories = products.map { it.product.category }.distinct().sorted()
+
+        ProductListUIState.Success(
+            products = sorted,
+            categories = categories,
+            selectedCategory = category,
+            sortOption = sortOption
+        ) as ProductListUIState
+    }.catch { error: Throwable ->
+        emit (ProductListUIState.Error(error.message.orEmpty()))
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = ProductListUIState.Loading,
+        started = WhileSubscribed(5000)
+    )
 
     private val _events = MutableSharedFlow<ProductListEvent>(extraBufferCapacity = 1)
     override val events = _events.asSharedFlow()
@@ -37,56 +75,8 @@ class ProductListViewModel @Inject constructor(
     override val filterVisible: StateFlow<Boolean> = settingsRepository.filtersVisible.stateIn(
         scope = viewModelScope,
         initialValue = true,
-        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000)
+        started = WhileSubscribed(5000)
     )
-
-    private var productJob: Job? = null
-
-    init {
-        loadProducts()
-    }
-
-    override fun loadProducts() {
-        _uiState.value = ProductListUIState.Loading
-        productJob?.cancel()
-        productJob = combine(
-            getProductsUseCase(),
-            settingsRepository.selectedCategory,
-            settingsRepository.sortOption
-        ) { products, category, sortOption ->
-
-            var filteredProducts = products
-
-            if (category != null) {
-                filteredProducts = filteredProducts.filter { it.product.category == category }
-            }
-
-            val sorted = when (sortOption) {
-                PRICE_ASC -> filteredProducts.sortedBy { effectivePrice(it) }
-                PRICE_DESC -> filteredProducts.sortedByDescending { effectivePrice(it) }
-                NONE -> filteredProducts
-                DISCOUNT ->
-                    //filteredProducts.sortedByDescending { effectiveDiscountPercent(it) }
-                    filteredProducts.sortedWith (
-                        compareByDescending<ProductWithPromotion> { effectiveDiscountPercent(it) }
-                            .thenBy { it.promotion == null }
-                    )
-            }
-
-            val categories = products.map { it.product.category }.distinct().sorted()
-
-            ProductListUIState.Success(
-                products = sorted,
-                categories = categories,
-                selectedCategory = category,
-                sortOption = sortOption
-            )
-        }.onEach { state ->
-            _uiState.value = state
-        }.catch { error ->
-            _uiState.value = ProductListUIState.Error(error.message.orEmpty())
-        }.launchIn(viewModelScope)
-    }
 
     override fun setCategory(category: String?) {
         viewModelScope.launch {

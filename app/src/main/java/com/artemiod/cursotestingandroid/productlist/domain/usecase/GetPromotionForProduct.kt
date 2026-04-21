@@ -12,16 +12,6 @@ class GetPromotionForProduct @Inject constructor() {
     operator fun invoke(product: Product, promotions: List<Promotion>): ProductPromotion? {
         val productPromos = promotions.filter { it.productIds.contains(product.id) }
 
-        val percentPromo = productPromos
-            .filter { it.type == PromotionType.PERCENT }
-            .maxByOrNull { it.value }
-
-        if (percentPromo != null) {
-            val percent = percentPromo.value.coerceIn(0.0, 100.0)
-            val discountedPrice = (product.price * (1 - percent / 100.0)).roundTo2Decimals()
-            return ProductPromotion.Percent(percent, discountedPrice)
-        }
-
         val buyPayPromo = productPromos.firstOrNull { it.type == PromotionType.BUY_X_PAY_Y }
         if (buyPayPromo != null) {
             val buy = buyPayPromo.bayQuantity ?: return null
@@ -33,6 +23,17 @@ class GetPromotionForProduct @Inject constructor() {
                 label = "${buy}x${pay}"
             )
         }
+
+        val percentPromo = productPromos
+            .filter { it.type == PromotionType.PERCENT }
+            .maxByOrNull { it.value }
+
+        if (percentPromo != null) {
+            val percent = percentPromo.value.coerceIn(0.0, 100.0)
+            val discountedPrice = (product.price * (1 - percent / 100.0)).roundTo2Decimals()
+            return ProductPromotion.Percent(percent, discountedPrice)
+        }
+
         return null
     }
 }

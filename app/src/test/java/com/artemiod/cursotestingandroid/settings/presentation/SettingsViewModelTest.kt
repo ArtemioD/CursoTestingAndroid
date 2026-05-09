@@ -5,6 +5,7 @@ import app.cash.turbine.turbineScope
 import com.artemiod.cursotestingandroid.core.MainDispatcherRule
 import com.artemiod.cursotestingandroid.core.domain.model.ThemeMode
 import com.artemiod.cursotestingandroid.core.fakes.FakeSettingsRepository
+import com.artemiod.cursotestingandroid.settings.presentation.SettingsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first

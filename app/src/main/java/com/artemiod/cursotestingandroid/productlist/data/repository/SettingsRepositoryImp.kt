@@ -1,5 +1,6 @@
 package com.artemiod.cursotestingandroid.productlist.data.repository
 
+import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -12,6 +13,7 @@ import com.artemiod.cursotestingandroid.productlist.domain.model.SortOption
 import com.artemiod.cursotestingandroid.productlist.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
@@ -92,6 +94,12 @@ class SettingsRepositoryImp @Inject constructor(
         dataStore.edit { preferences ->
             preferences[SORT_OPTION_KEY] = value.name
         }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    suspend fun clear() {
+        dataStore.edit { it.clear() }
+        dataStore.data.first { it.asMap().isEmpty() }
     }
 
     companion object {

@@ -13,6 +13,15 @@ android {
         version = release(36)
     }
 
+    sourceSets {
+        getByName("test") {
+            java.directories.add("src/sharedTest/java")
+        }
+        getByName("androidTest") {
+            java.directories.add("src/sharedTest/java")
+        }
+    }
+
     defaultConfig {
         applicationId = "com.artemiod.cursotestingandroid"
         minSdk = 26
@@ -20,7 +29,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.artemiod.cursotestingandroid.HiltTestRunner"
     }
 
     buildTypes {
@@ -36,12 +46,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
 
@@ -111,5 +124,13 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk) // https://mockk.io/
     testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
+    testImplementation(libs.mockwebserver)
     testImplementation(libs.turbine) // https://github.com/cashapp/turbine
+
+    androidTestImplementation(libs.turbine) // https://github.com/cashapp/turbine
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.kotlin.test)
+
 }

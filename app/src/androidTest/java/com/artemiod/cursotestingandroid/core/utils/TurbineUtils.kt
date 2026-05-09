@@ -1,0 +1,12 @@
+package com.artemiod.cursotestingandroid.core.utils
+
+import app.cash.turbine.ReceiveTurbine
+
+suspend fun <T> ReceiveTurbine<T>.awaitStateMatching(
+    predicate: (T) -> Boolean
+): T {
+    while (true) {
+        val item = awaitItem()
+        if (predicate(item)) return item
+    }
+}

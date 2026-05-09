@@ -1,15 +1,12 @@
 package com.artemiod.cursotestingandroid.cart.data.repository
 
-import android.util.Log
 import com.artemiod.cursotestingandroid.cart.data.mapper.toDomain
 import com.artemiod.cursotestingandroid.cart.data.mapper.toEntity
 import com.artemiod.cursotestingandroid.cart.domain.model.CartItem
 import com.artemiod.cursotestingandroid.cart.domain.repository.CartItemRepository
 import com.artemiod.cursotestingandroid.core.domain.model.AppError
 import com.artemiod.cursotestingandroid.productlist.data.local.LocalDataSource
-import com.artemiod.cursotestingandroid.productlist.data.mappers.toDomain
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -29,7 +26,7 @@ class CartItemRepositoryImp @Inject constructor(
             val newQuantity = existingItem.quantity + quantity
             localDataSource.updateCartItem(existingItem.copy(quantity = newQuantity))
         } else {
-            localDataSource.addToCart(
+            localDataSource.insertCartItem(
                 CartItem(
                     productId = productId,
                     quantity = quantity

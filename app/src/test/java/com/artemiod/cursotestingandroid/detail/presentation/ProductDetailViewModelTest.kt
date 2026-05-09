@@ -128,7 +128,7 @@ class ProductDetailViewModelTest {
         }
 
     @Test
-    fun `given loaded product withouth stock when add to cart then emits insufficient stock error`() =
+    fun `given loaded product without stock when add to cart then emits insufficient stock error`() =
         runTest(mainDispatcherRule.scheduler) {
             // Given
             val productId = "id1"

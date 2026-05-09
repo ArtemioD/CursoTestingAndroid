@@ -1,10 +1,14 @@
-package com.artemiod.cursotestingandroid.di
+package com.artemiod.cursotestingandroid.core.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import com.artemiod.cursotestingandroid.cart.data.local.database.dao.CartItemDao
 import com.artemiod.cursotestingandroid.cart.data.repository.CartItemRepositoryImp
 import com.artemiod.cursotestingandroid.cart.domain.repository.CartItemRepository
@@ -13,6 +17,7 @@ import com.artemiod.cursotestingandroid.core.data.local.database.MiniMarketDatab
 import com.artemiod.cursotestingandroid.core.data.util.SystemClock
 import com.artemiod.cursotestingandroid.core.domain.corroutines.DispatchersProvider
 import com.artemiod.cursotestingandroid.core.domain.util.Clock
+import com.artemiod.cursotestingandroid.di.DataModule
 import com.artemiod.cursotestingandroid.productlist.data.local.database.dao.ProductDao
 import com.artemiod.cursotestingandroid.productlist.data.local.database.dao.PromotionDao
 import com.artemiod.cursotestingandroid.productlist.data.repository.ProductRepositoryImp
@@ -23,15 +28,19 @@ import com.artemiod.cursotestingandroid.productlist.domain.repository.PromotionR
 import com.artemiod.cursotestingandroid.productlist.domain.repository.SettingsRepository
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
+import java.util.UUID
 import javax.inject.Singleton
 
-private val Context.dataStore by preferencesDataStore("settings")
+private val Context.testingDataStore by preferencesDataStore("testing_settings")
+
 @Module
-@InstallIn(SingletonComponent::class)
-object DataModule {
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [DataModule::class]
+)
+object TestDataModule {
 
     @Provides
     @Singleton
@@ -52,6 +61,23 @@ object DataModule {
     }
 
     @Provides
+    fun provideProductDao(database: MiniMarketDatabase): ProductDao = database.productDao()
+
+    @Provides
+    fun providePromotionDao(database: MiniMarketDatabase): PromotionDao = database.promotionDao()
+
+    @Provides
+    fun provideCartItemDao(database: MiniMarketDatabase): CartItemDao = database.cartItemDao()
+
+    @Provides
+    @Singleton
+    fun provideDatabase(): MiniMarketDatabase {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        return Room.inMemoryDatabaseBuilder(context, MiniMarketDatabase::class.java)
+            .build()
+    }
+
+    @Provides
     @Singleton
     fun provideSettingRepository(settingsRepositoryImp: SettingsRepositoryImp): SettingsRepository {
         return settingsRepositoryImp
@@ -69,30 +95,17 @@ object DataModule {
         return systemClock
     }
 
-
-    // data base
-
-    @Provides
-    fun provideProductDao(database: MiniMarketDatabase): ProductDao = database.productDao()
-
-    @Provides
-    fun providePromotionDao(database: MiniMarketDatabase): PromotionDao = database.promotionDao()
-
-    @Provides
-    fun provideCartItemDao(database: MiniMarketDatabase): CartItemDao = database.cartItemDao()
-
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): MiniMarketDatabase {
-        return Room.databaseBuilder(
-            context = context,
-            klass = MiniMarketDatabase::class.java,
-            name = "minimarket_database").build()
+    fun provideDataStore() : DataStore<Preferences> {
+        //return ApplicationProvider.getApplicationContext<Context>().testingDataStore
+        val context = ApplicationProvider.getApplicationContext<Context>()
+
+        return PreferenceDataStoreFactory.create(
+            produceFile = {
+                context.preferencesDataStoreFile("test_settings_${UUID.randomUUID()}")
+            },
+        )
     }
 
-    @Provides
-    @Singleton
-    fun provideDataStore(@ApplicationContext context: Context) : DataStore<Preferences> {
-        return context.dataStore
-    }
 }

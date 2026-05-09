@@ -1,6 +1,5 @@
 package com.artemiod.cursotestingandroid.di
 
-import androidx.room.ProvidedAutoMigrationSpec
 import com.artemiod.cursotestingandroid.BuildConfig
 import com.artemiod.cursotestingandroid.productlist.data.remote.MiniMarketApiService
 import dagger.Module

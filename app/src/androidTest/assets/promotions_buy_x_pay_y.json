@@ -1,0 +1,14 @@
+{
+  "promotions": [
+    {
+      "id": "bxpy",
+      "productId": "p1",
+      "type": "BUY_X_PAY_Y",
+      "percent": null,
+      "buyX": 3,
+      "payY": 2,
+      "startAtEpoch": 1700000000,
+      "endAtEpoch": 1893456000
+    }
+  ]
+}

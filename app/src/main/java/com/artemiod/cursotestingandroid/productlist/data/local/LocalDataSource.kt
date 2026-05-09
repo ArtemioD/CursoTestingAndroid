@@ -1,6 +1,5 @@
 package com.artemiod.cursotestingandroid.productlist.data.local
 
-import android.util.Log
 import com.artemiod.cursotestingandroid.cart.data.local.database.dao.CartItemDao
 import com.artemiod.cursotestingandroid.cart.data.local.database.entity.CartItemEntity
 import com.artemiod.cursotestingandroid.productlist.data.local.database.dao.ProductDao
@@ -8,7 +7,6 @@ import com.artemiod.cursotestingandroid.productlist.data.local.database.dao.Prom
 import com.artemiod.cursotestingandroid.productlist.data.local.database.entity.ProductEntity
 import com.artemiod.cursotestingandroid.productlist.data.local.database.entity.PromotionEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
@@ -75,7 +73,7 @@ class LocalDataSource @Inject constructor(
         }
     }
 
-    suspend fun addToCart(cartItem: CartItemEntity) : Result<Unit> {
+    suspend fun insertCartItem(cartItem: CartItemEntity) : Result<Unit> {
         return try {
             cartItemDao.insertCartItem(cartItem)
             Result.success(Unit)
@@ -83,6 +81,4 @@ class LocalDataSource @Inject constructor(
             Result.failure(e)
         }
     }
-
-
 }
